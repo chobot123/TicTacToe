@@ -1,0 +1,30 @@
+
+
+html, body {
+    height: 100vh;
+    margin: 0px;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.grid {
+    display: grid;
+    min-width: 550px;
+    min-height: 550px;
+    background-color: black;
+    border: 5px solid white;
+}
+
+.cell {
+    border: 10px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 100px;
+}

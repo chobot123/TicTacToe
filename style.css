@@ -8,17 +8,22 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
 
 .grid {
     display: grid;
-    min-width: 550px;
-    min-height: 550px;
+    min-width: 450px;
+    min-height: 450px;
     background-color: black;
     border: 5px solid white;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .cell {
@@ -28,4 +33,24 @@ body {
     align-items: center;
     color: white;
     font-size: 100px;
+}
+
+
+#title {
+    display: flex;
+    font-size: 100px;
+    margin: 60px;
+}
+
+#winner {
+    font-size: 36px;
+    padding: 20px;
+}
+
+.reset {
+    background-color: black;
+    color: white;
+    font-size: 36px;
+    padding: 10px;
+    border-radius: 24px;
 }

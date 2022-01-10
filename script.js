@@ -17,45 +17,40 @@ const Referee = (turns, tie, winner, playerOneTurn) => {
     }
 }
 
-const GAME_BOARD = (function(){
-    const _wrapper = document.querySelector(".wrapper");
+const GAME_BOARD = (() => {
+    let _wrapper = document.querySelector(".wrapper");
 
     //a private grid size static
-    const _gridSize = Array(9);
+    let _gridSize = Array(9);
 
 
     //grid variable 
-    const grid = document.createElement("div");
+    let grid = document.createElement("div");
     grid.className = "grid";
     _wrapper.appendChild(grid);
 
     //make 3x3 grid
     function makeGrid(grid) {
         grid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr)";
-        grid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr)";
+        grid.style.gridTemplateRows = "repeat(3, minmax(0, 1fr)";
         for(let i = 0; i < _gridSize.length; i++){
             let cell = document.createElement("div");
             cell.className = `cell`;
             cell.classList.add(i);
-            cell.innerText = i;
             grid.appendChild(cell);
         }
     }
     makeGrid(grid);
 
-    const test = true;
-
-    console.log(PLAY_GAME)
-
-
     return {
         grid,
-        test,
     }
 })();
 
-const PLAY_GAME = (function(){
+const PLAY_GAME = (() => {
+    const winCondition = document.getElementById("winner")
     //ALL win combinations
+    let test = false;
     const winCombo = 
     [
         [0,1,2],    
@@ -73,6 +68,7 @@ const PLAY_GAME = (function(){
     const referee = Referee(0, false, true); // turns tie playerOneTurn
     const grid = GAME_BOARD.grid;
     let availableCell = false;
+    let activePlayer = playerOne;
 
     //Player One Picks
     //Board takes input, updates turn count
@@ -102,7 +98,6 @@ const PLAY_GAME = (function(){
                         }
                     }
                 }
-                console.log(count);
                 if(count === 3){
 
                     player.winner = true;
@@ -118,44 +113,48 @@ const PLAY_GAME = (function(){
         }
     }
 
+    function makeMove(e) {
+        console.log(e.target)
+        let cell = e.target;
+        let index = cell.className.substring(5);
+        checkAvailable(cell);
+        toggleTurn();
+        if(referee.playerOneTurn === true && availableCell === true){
+            referee.turns++;
+            playerOne.decision.push(index);
+            cell.innerText = playerOne.marker;
+            checkWin(playerOne);
+            endGame();
+        }
+        else if(referee.playerOneTurn === false && availableCell === true){
+            referee.turns++;
+            playerTwo.decision.push(index);
+            cell.innerText = playerTwo.marker;
+            checkWin(playerTwo);
+            endGame();
+                   
+        }
+        cell.removeEventListener("click", makeMove);
+    }
+    let children = grid.children;
     //event listener on click -> Adds player's choice to player decisions array, marks the cell, and increases games total turns by 1
     function takeTurn(){
-        for(let i=0; i<grid.children.length;i++){
-            let cell = grid.children[i];
-            cell.addEventListener("click", function(){
-                let index = cell.className.substring(5);
-                checkAvailable(cell);
-                toggleTurn();
-                console.log(referee.playerOneTurn)
-               if(referee.playerOneTurn === true && availableCell === true){
-                   referee.turns++;
-                   playerOne.decision.push(index);
-                   cell.innerText = playerOne.marker;
-                   checkWin(playerOne);
-                   endGame();
-               }
-               else if(referee.playerOneTurn === false && availableCell === true){
-                   referee.turns++;
-                   playerTwo.decision.push(index);
-                   cell.innerText = playerTwo.marker;
-                   checkWin(playerTwo);
-                   endGame();
-                   
-               }
-            })
+        for(let i=0; i<children.length;i++){
+            let cell = children[i];
+            cell.addEventListener("click", makeMove);
         }
-
     }
 
     function resetBoard() {
         for(let i=0; i<grid.children.length; i++){
             let cell = grid.children[i];
-            cell.innerText = i;
+            cell.innerText = "";
         }
         resetDefault(playerOne);
         resetDefault(playerTwo);
         refDefault(referee);
-        console.log(referee);
+        winCondition.innerHTML = "";
+        takeTurn();
     }
 
     function resetDefault(player) {
@@ -173,32 +172,35 @@ const PLAY_GAME = (function(){
 
     btn.addEventListener("click", resetBoard);
 
+    function removePlay (func) {
+        for(let i=0; i<children.length;i++){
+            let cell = children[i];
+            cell.removeEventListener("click", func);
+        }
+    }
+
     function endGame() {
         if(referee.tie === true){
             //announce tie
-            console.log(`tie game`)
+            winCondition.innerHTML = "It's a Tie!";
             //reset game
+            removePlay(makeMove);
         }
         if(playerOne.winner === true){
             //anounce winner
-            console.log(`playerOne Wins!`)
+            winCondition.innerHTML = "Player One Wins!";
             //reset game
+            removePlay(makeMove);
         }
 
 
         else if(playerTwo.winner === true){
             //announce p2 wins
-            console.log(`player two wins!`)
+            winCondition.innerHTML = "Player Two Wins!";
             //reset game
-            resetBoard();
+            removePlay(makeMove);
         }
     }
-    
-    const getWinner = () => {
-        return availableCell;
-    }
 
-    return {
-        getWinner,
-    }
+    takeTurn();
 })();
